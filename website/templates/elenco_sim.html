@@ -1,0 +1,52 @@
+<!--import della base-->
+{% extends "base.html" %}
+<!-- Esempio per modificare il contenuto dei blocchi nella base: sovrascrive i blocchi del template base-->
+{% block title %}Le mie simulazioni{% endblock %}
+
+{% block content %}
+
+
+<h1 align = "center">Le mie simulazioni</h1>
+<ul class="list-group">
+    {% for sim in  user.simulazioni %}
+    <li class = "list-group-item">
+
+    <div class="row">
+        <div align = "center" class="col-sm-4"><h2>Nome</h4></div>
+        <div align = "center" class="col-sm-4"><h2>Data</h4></div>
+        <div align = "center" class="col-sm-4"><a role = "button" class="btn btn-primary"  href="/dettagli_sim/{{ sim.id }}" >Dettagli</a></div>
+    </div>
+    
+    <div class="row">
+        <div align = "center" class="col-sm-4"><B>{{ sim.nome }}</B></div>
+        <div align = "center" class="col-sm-4"><B>{{ sim.date }}</B></div>
+        <div align = "center" class="col-sm-4"><button type="button" class="btn btn-primary"  onClick="deleteSim({{ sim.id }})" >Elimina</button></div>
+
+        <!-- <div align = "left" class="col-sm-4"><button  type="button" class="close" onClick="deleteSim({{ sim.id }})"><span aria-hidden="true">&times;</span></button></div>-->
+    
+    </div>
+    </li>
+    <!--
+    <li class = "list-group-item">
+        <h2>Nome:</h4> {{ sim.nome }}
+        <div class = "container-fluid row">
+         <a align="right" class="nav-item nav-link" id="simulate" href="/dettagli_sim/{{ sim.id }}" >Dettagli</a>
+         <div class = "row">
+         <button  type="button" class="close" onClick="deleteSim({{ sim.id }})"><span aria-hidden="true">&times;</span></button>
+         </div>
+        </div> 
+    </li>
+    -->
+    {% endfor %}
+</ul>
+
+<!--<form method = "POST">
+    <textarea name ="note" id = "note" class = "form-control"></textarea>
+    <br/>
+    <div align = "center">
+        <button type = "submit" class = "btn btn-primary">Add Note</button>
+    </div>
+</form>
+-->
+{% endblock %}
+

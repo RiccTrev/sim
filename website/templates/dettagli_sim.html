@@ -1,0 +1,107 @@
+<!--import della base-->
+{% extends "base.html" %}
+<!-- Esempio per modificare il contenuto dei blocchi nella base: sovrascrive i blocchi del template base-->
+{% block title %}Dettagli della simulazione{% endblock %}
+
+{% block content %}
+
+<br/>
+<div align="center" class ="row">
+<h1 align = "centre">Dettagli della simulazione</h1>
+</div>
+
+<div class="row">
+  <div align="center" class=" container-fluid col-sm-2">
+    <h3 align = "left">Parametri di simulazione</h3>
+    
+    <p align = "left"><B>Costo medio energia:</B> {{ sim.incentivo_arera }} €/kWh</p>
+    <p align = "left"><B>Incentivo Arera:</B> {{ sim.costo_medio_energia }} €/kWh</p>
+    <p align = "left"><B>Incentivo MiSe:</B> {{ sim.incentivo_mise }} €/kWh</p>
+    <p align = "left"><B>Ritiro dedicato:</B> {{ sim.ritiro_dedicato }} €/kWh</p>
+    <p align = "left"><B>Valorizzazione produzione idroelettrico:</B> {{ sim.val_prod_idro }} €/kWh</p>
+    <p align = "left"><B>Incentivo condivisione idroelettrico:</B> {{ sim.inc_cond_idro }} €/kWh</p>
+    <p align = "left"><B>Percentuale attribuibile:</B> {{ sim.p_attribuibile * 100 }}%</p>
+    <p align = "left"><B>Percentuale fissa:</B> {{ sim.p_fissa *100 }}%</p>
+    <p align = "left"><B>Percentuale consumatori:</B> {{ sim.p_consumatori*100 }}%</p>
+    <p align = "left"><B>Percentuale produttori:</B> {{ sim.p_produttore*100 }}%</p>
+    <p align = "left"><B>Architettura CER:</B> {{ sim.Architettura_CER }} €/partecipante</p>
+    <p align = "left"><B>Tempo "ammortamento" architettura:</B> {{ sim.Tempo_Ammortamento_Architettura }} anni</p>
+    <p align = "left"><B>Commissione:</B> {{ sim.Commissione }} €/partecipante</p>
+    <p align = "left"><B>Ammortamento fotovoltaico:</B> {{ sim.Ammortamento_Fotovoltaico }}% </p>
+    <p align = "left"><B>Tempo ammortamento fotovoltaico:</B> {{ sim.Tempo_Ammortamento_Fotovoltaico }} anni</p>
+    <p align = "left"><B>PUN:</B> {{ sim.PUN }} €/kWh</p>
+    <p align = "left"><B>Taglia Specifica:</B> {% if sim.taglia_specifica == -1 %}ottimale{% endif %}
+                                               {% if sim.taglia_specifica == 0 %}0 kWp{% endif %}
+                                               {% if sim.taglia_specifica > 0 %}{{sim.tagliaglia_specifica}} kWp{% endif %}</p>
+    
+  </div>
+
+
+  <div class="col-sm-10">
+    <div class="row">
+      <table id="SimRes"class="table table-responsive table-striped flex-fill" style="width:100%">
+        <thead>
+          <tr>
+          {% for column in df_cer.columns %}
+            <th>{{column}}</th>
+          {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, row in df_cer.iterrows() %}
+          <tr> 
+            {% for column in df_cer %}
+            <td>{% if row[column] is float or int %}
+                  {{row[column]|round(2)}}</td>
+                {% else %}
+                  {{row[column]}}</td>
+                {% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="row col-sm-2">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="exportTableToExcel('SimRes', 'simulation-df_cer')">Scarica tabella in formato Excel</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <table id="SimSSP"class="table table-responsive table-striped flex-fill" style="width:100%">
+        <thead>
+          <tr>
+          {% for column in df_ssp.columns %}
+            <th>{{column}}</th>
+          {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, row in df_ssp.iterrows() %}
+          <tr> 
+            {% for column in df_ssp %}
+            <td>{% if row[column] is float or int %}
+                  {{row[column]|round(2)}}</td>
+                {% else %}
+                  {{row[column]}}</td>
+                {% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="row col-sm-2">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="exportTableToExcel('SimSSP', 'simulation-df_ssp')">Scarica tabella in formato Excel</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="row"></div>
+<h1>Seconda riga</h1>
+</div>
+
+{% endblock %}
+
