@@ -18,13 +18,13 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user: 
             if check_password_hash(user.password, password): #Confronta gli hash
-                flash('Logged in successfully!', category = 'success')
+                flash('Accesso effettuato!', category = 'success')
                 login_user(user, remember = True)
                 return redirect(url_for('views.elenco_sim'))
             else: 
-                flash('Password incorrect!', category = 'error')
+                flash('Password incorretta!', category = 'error')
         else: 
-            flash('Email does not exist!', category = 'error')
+            flash('Email non esistente!', category = 'error')
 
     return render_template("login.html", user = current_user)
 
@@ -47,16 +47,16 @@ def sign_up():
         #Verifico se la mail è già registrata
         user = User.query.filter_by(email=email).first()
         if user: 
-            flash('Email already exists', category = 'error')
+            flash('Email già registrata', category = 'error')
         #Controllo dei parametri in input
         elif len(email) < 4: 
-            flash('Email must be greater than 3 characters', category='error')
+            flash('Email deve essere contenere più di 3 caratteri', category='error')
         elif len(first_name) < 2: 
-            flash('First name must be greater than 1 characters', category='error')
+            flash('Nome deve essere contenere più di un carattere', category='error')
         elif password1 != password2: 
-            flash('Password does not match must be greater than 4 characters', category='error')
+            flash('Password non corrispondenti', category='error')
         elif len(password1) < 7: 
-            flash('Password must be at least 7 characters', category='error')
+            flash('Password deve contenere più di 7 caratteri', category='error')
         else: 
             #add user to db
             new_user = User(email=email, first_name=first_name, password = generate_password_hash(password1, method ="sha256"))
@@ -64,7 +64,7 @@ def sign_up():
             db.session.commit()
             #Faccio il login dell'utente
             login_user(new_user, remember=True)
-            flash('Account created!', category='success')
+            flash('Account creato!', category='success')
             return redirect(url_for('views.elenco_sim'))
 
     return render_template("sign_up.html", user = current_user)
