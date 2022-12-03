@@ -112,42 +112,37 @@ def VerificaIdro(df):
 
 
 def StimaProduzione(df):
-    mesi = {
-        0: 'gen',
-        1: 'feb',
-        2: 'mar',
-        3: 'apr',
-        4: 'mag',
-        5: 'giu',
-        6: 'lug',
-        7: 'ago',
-        8: 'set',
-        9: 'ott',
-        10: 'nov',
-        11: 'dic'
-    }
-    output = pd.DataFrame(columns=['Identificativo', 'Lat', 'Long', 'Periodo', 'Produzione'])
-    old_id = str(0)
-    for index, row in df.iterrows():
-        if row['Potenza Da Installare'] == 0:
-            continue
-        if old_id == row['Identificativo']:
-            continue
-        else:
-            old_id = row['Identificativo']
-        response = requests.get("https://re.jrc.ec.europa.eu/api/v5_1/PVcalc?lat=" + str(row['Lat']) + "&lon=" + str(
-            row['Long']) + "&raddatabase=PVGIS-SARAH&peakpower=" + str(
-            row['Potenza Da Installare']) + "&pvtechchoice=crystSi&loss=" + str(
-            8) + "&optimalinclination=1&vertical_optimum=1&outputformat=json")
-        todos = json.loads(response.text)
-        # for i in range (1,13)
-        for i in range(0, 12):
-            new_row = {}
-            new_row = {'Identificativo': row['Identificativo'], 'Lat': row['Lat'], 'Long': row['Long'],
-                       'Periodo': mesi[i], 'Produzione': todos['outputs']['monthly']['fixed'][i]['E_m']}
-            output = output.append(new_row, ignore_index=True)
-    return output
-
+  mesi = {
+      0:'gen',
+      1:'feb',
+      2:'mar',
+      3:'apr',
+      4:'mag',
+      5:'giu',
+      6:'lug',
+      7:'ago',
+      8:'set',
+      9:'ott',
+      10:'nov',
+      11:'dic'
+  }
+  output = pd.DataFrame(columns = ['Identificativo', 'Lat', 'Long', 'Periodo', 'Produzione'])
+  old_id = str(0)
+  for index, row in df.iterrows():
+    if row['Potenza Da Installare'] == 0:
+      continue
+    if old_id == row['Identificativo']:
+      continue
+    else:
+      old_id = row['Identificativo']
+    response = requests.get("https://re.jrc.ec.europa.eu/api/v5_1/PVcalc?lat="+str(row['Lat'])+"&lon="+str(row['Long'])+"&raddatabase=PVGIS-SARAH&peakpower="+str(row['Potenza Da Installare'])+"&pvtechchoice=crystSi&loss="+str(16)+"&optimalinclination=1&vertical_optimum=1&outputformat=json")
+    todos = json.loads(response.text)
+    #for i in range (1,13)
+    for i in range (0,12):
+      new_row = {}
+      new_row = {'Identificativo': row['Identificativo'], 'Lat':row['Lat'], 'Long':row['Long'],'Periodo':mesi[i], 'Produzione': todos['outputs']['monthly']['fixed'][i]['E_m']}
+      output = output.append(new_row, ignore_index=True)
+  return output
 
 def CalcolaBenficiSSP(df, prezzo_energia, corr_forfettario):
     temporary_ssp = df.groupby(by=["Identificativo"], as_index=True).agg(
@@ -195,15 +190,19 @@ def CalcolaIncentivo(df, QuotaProCapite, Quota_Consumatori, Quota_Produttore, Qu
         print('non rientra in nessuna categoria ERRORE')
 
 
-def simula(file, PUN, costo_medio_energia, incentivo_arera, incentivo_mise, ritiro_dedicato, val_prod_idro,
-           inc_cond_idro, taglia_specifica, p_attribuibile, p_fissa, p_consumatori, p_produttore, Architettura_CER,
-           Tempo_Ammortamento_Architettura, Commissione, Ammortamento_Impianto_Fotovoltaico,
-           Tempo_Ammortamento_Fotovoltaico):
+def simula(file, costo_medio_energia, incentivo_arera, incentivo_mise, ritiro_dedicato, val_prod_idro, inc_cond_idro,
+                                              p_attribuibile, p_fissa, p_consumatori, p_produttore, Architettura_CER,
+                                              Tempo_Ammortamento_Architettura, Commissione, Ammortamento_Fotovoltaico,
+                                              Tempo_Ammortamento_Fotovoltaico, PUN, taglia_specifica):
     p_costi_gestione = 1 - p_attribuibile
     p_variabile = 1 - p_fissa
     p_immissione = 1 - p_consumatori
     p_prosumer = 1 - p_produttore
-
+    print(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
+    print(file, costo_medio_energia, PUN, incentivo_arera, incentivo_mise, ritiro_dedicato, val_prod_idro,
+           inc_cond_idro, taglia_specifica, p_attribuibile, p_fissa, p_consumatori, p_produttore, Architettura_CER,
+           Tempo_Ammortamento_Architettura, Commissione, Ammortamento_Impianto_Fotovoltaico,
+           Tempo_Ammortamento_Fotovoltaico)
     # Percorso del file revised creato con il notebook 'Preparazione'
     try:
         # fn = 'c:Users/trevi/Desktop/Test/Sample_DER.xlsx'
@@ -220,7 +219,7 @@ def simula(file, PUN, costo_medio_energia, incentivo_arera, incentivo_mise, riti
     df = dfs['CER']
 
     # Stima della produzione
-    df_produzione = StimaProduzione(df)
+    df_produzione = StimaProduzione(df.fillna(0))
     df = pd.merge(df, df_produzione, on=('Identificativo', 'Periodo'), how='left')
     df = df.drop(columns=['Lat_y', 'Long_y', 'Lat_x', 'Long_x'])
     df = df.rename(columns={'Produzione': 'Produzione Aggiuntiva'})
@@ -289,7 +288,7 @@ def simula(file, PUN, costo_medio_energia, incentivo_arera, incentivo_mise, riti
     df_finale = df_finale.drop(columns=['Consumo Totale Annuo'])
 
     # Identifico conc he taglia di impianto lavorare (se specificata o meno)
-    if taglia_specifica > 0:
+    if taglia_specifica == 0:
         df_finale['Taglia Impianto Potenziale'] = 0
         df_finale['Costo Impianto Potenziale'] = 0
         produttore = {'Identificativo': 'Produttore', 'Taglia Impianto': taglia_specifica, 'Somma Fascia 1': 0,
@@ -423,8 +422,7 @@ def simula(file, PUN, costo_medio_energia, incentivo_arera, incentivo_mise, riti
     Costo_Totale_Impianti = df_finale[df_finale['Categoria'] == 'Produttore']['Costo Impianto Potenziale'].sum()
     # Attribuzione costi di funzionameto
     # Costi di Funzionamento = commissione + costo architettura + rimborso quota impianti a produttori
-    Costi_Di_Funzionamento = (Commissione * numero_partecipanti) + ((
-                                                                                Architettura_CER * numero_partecipanti) / Tempo_Ammortamento_Architettura)  # Sarebbero da considerare separati
+    Costi_Di_Funzionamento = (Commissione * numero_partecipanti) + ((Architettura_CER * numero_partecipanti) / Tempo_Ammortamento_Architettura)  # Sarebbero da considerare separati
     Costi_Di_Impianto = (Costo_Totale_Impianti * Ammortamento_Impianto_Fotovoltaico / Tempo_Ammortamento_Fotovoltaico)
     Costi_Di_Funzionamento_Produttore = ((Costi_Di_Funzionamento) / numero_partecipanti) * numero_produttori
     Costi_Di_Funzionamento_Consumer = ((Costi_Di_Funzionamento - Costi_Di_Funzionamento_Produttore))
