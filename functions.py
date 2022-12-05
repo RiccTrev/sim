@@ -9,10 +9,6 @@ import os.path
 from pathlib import Path
 
 
-def pow(x, y):
-    return int(x) ** int(y)
-
-
 '''Parametri economici per simulazione SSP'''
 # INPUTS
 # Parametri economici SSP
@@ -198,11 +194,7 @@ def simula(file, costo_medio_energia, incentivo_arera, incentivo_mise, ritiro_de
     p_variabile = 1 - p_fissa
     p_immissione = 1 - p_consumatori
     p_prosumer = 1 - p_produttore
-    print(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]')
-    print(file, costo_medio_energia, PUN, incentivo_arera, incentivo_mise, ritiro_dedicato, val_prod_idro,
-           inc_cond_idro, taglia_specifica, p_attribuibile, p_fissa, p_consumatori, p_produttore, Architettura_CER,
-           Tempo_Ammortamento_Architettura, Commissione, Ammortamento_Impianto_Fotovoltaico,
-           Tempo_Ammortamento_Fotovoltaico)
+
     # Percorso del file revised creato con il notebook 'Preparazione'
     try:
         # fn = 'c:Users/trevi/Desktop/Test/Sample_DER.xlsx'
@@ -491,7 +483,41 @@ def simula(file, costo_medio_energia, incentivo_arera, incentivo_mise, ritiro_de
                                           'Trattenuta Incentivo Condivizione': 'Costi Gestione CER'})
     # df_finale.style.format(thousands = '.', precision = 0)
     # df_finale.style.format(thousands = ',', precision = 2)
-    print(df_finale)
+    #print(df_finale)
 
-    return df_finale, df_ssp
+    dict_summary = {
+        "condivisa": [condivisa],
+        "numero_produttori": [numero_produttori],
+        "numero_prosumer": [numero_prosumer],
+        "numero_partecipanti": [numero_partecipanti],
+        "numero_membri": [numero_membri],
+        "numero_consumer": [numero_consumer],
+        'Incentivo_Totale_Condivisione': [Incentivo_Totale_Condivisione],
+        'Incentivo_Attribuibile': [Incentivo_Attribuibile],
+        "Incentivo_Costi_Gestione": [Incentivo_Costi_Gestione],
+        "Quota_Fissa": [Quota_Fissa],
+        "Quota_Variabile": [Quota_Variabile],
+        "Quota_Consumatori": [Quota_Consumatori],
+        "Quota_Immissione": [Quota_Immissione],
+        "Quota_Produttore": [Quota_Produttore],
+        "Quota_Prosumer": [Quota_Prosumer],
+        "QuotaProCapite": [QuotaProCapite],
+        "Flussi_Di_Cassa_CER": [Flussi_Di_Cassa_CER],
+        "Costo_Totale_Impianti": [Costo_Totale_Impianti],
+        "Costi_Di_Funzionamento": [Costi_Di_Funzionamento],
+        "Costi_Di_Impianto": [Costi_Di_Impianto],
+        "Costi_Di_Funzionamento_Produttore": [Costi_Di_Funzionamento_Produttore],
+        "Costi_Di_Funzionamento_Consumer": [Costi_Di_Funzionamento_Consumer],
+        "Trattenute_Incentivi": [Trattenute_Incentivi],
+        "Margine_CER": [Margine_CER],
+        "Bilancio_Economico_CER": [Bilancio_Economico_CER],
+        "Quota_Idro": [Quota_Idro]
+    }
+    #df_summary = pd.DataFrame(list(my_dict.items()), columns=['column1', 'column2'])
+    #print(dict_summary)
+    df_summary = pd.DataFrame.from_dict(dict_summary)
+
+    print('DF_SUMMARY: ')
+    print(df_summary)
+    return df_finale, df_ssp, df_summary
 

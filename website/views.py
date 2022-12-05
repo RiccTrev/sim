@@ -6,6 +6,7 @@ from .models import Note, Simulazioni
 from .models import User
 import json
 import functions
+import graphs
 import pandas as pd
 import pathlib
 
@@ -80,14 +81,17 @@ def set_up():
         taglia_specifica = float(request.form.get('taglia_specifica'))
         # Verifica del file in input con corretta esec
         try:
-            df_cer, df_ssp = functions.simula(file, costo_medio_energia, incentivo_arera,
-                                              incentivo_mise, ritiro_dedicato, val_prod_idro, inc_cond_idro,
-                                              p_attribuibile, p_fissa, p_consumatori, p_produttore, Architettura_CER,
-                                              Tempo_Ammortamento_Architettura, Commissione, Ammortamento_Fotovoltaico,
-                                              Tempo_Ammortamento_Fotovoltaico, PUN, taglia_specifica)
+            df_cer, df_ssp, df_summary = functions.simula(file, costo_medio_energia, incentivo_arera,
+                                                          incentivo_mise, ritiro_dedicato, val_prod_idro, inc_cond_idro,
+                                                          p_attribuibile, p_fissa, p_consumatori, p_produttore,
+                                                          Architettura_CER,
+                                                          Tempo_Ammortamento_Architettura, Commissione,
+                                                          Ammortamento_Fotovoltaico,
+                                                          Tempo_Ammortamento_Fotovoltaico, PUN, taglia_specifica)
             # converto i df in json
             json_df_cer = df_cer.to_json(orient='columns')
             json_df_ssp = df_ssp.to_json(orient="columns")
+            json_df_summary = df_summary.to_json(orient="columns")
 
             # Salvo la simulazione nel database
             try:
@@ -111,7 +115,7 @@ def set_up():
                                       taglia_specifica=float(taglia_specifica),
                                       df_cer=json_df_cer,
                                       df_ssp=json_df_ssp,
-
+                                      df_summary=json_df_summary,
                                       user_id=current_user.id)
                 # new_sim= Simulazioni(nome = nome, df_cer = json_df_cer, df_ssp = json_df_ssp, user_id = current_user.id)
 
@@ -134,4 +138,23 @@ def dettagli_sim(id_sim):
     sim = Simulazioni.query.filter_by(id=id_sim).first()
     df_cer = pd.read_json(sim.df_cer)
     df_ssp = pd.read_json(sim.df_ssp)
-    return render_template("dettagli_sim.html", user=current_user, df_cer=df_cer, df_ssp=df_ssp, sim=sim)
+    df_summary = pd.read_json(sim.df_summary)
+    try:
+        GraphRipartizioneQuote = graphs.RipartizioneQuote(df_cer, df_summary)
+        GraphConfrontoCondivisioneRid = graphs.ConfrontoCondivisioneRid(df_cer, df_summary)
+        GraphRipartizioneCondivisione = graphs.RipartizioneCondivisione(df_cer)
+        GraphBilancioEnergetico = graphs.BilancioEnergetico(df_cer)
+        GraphEntrateTotali = graphs.EntrateTotali(df_cer)
+        GraphConfrontoBenefici = graphs.ConfrontoBenefici(df_cer)
+        print(GraphConfrontoCondivisioneRid)
+        print(GraphRipartizioneQuote)
+        return render_template("dettagli_sim.html", user=current_user, df_cer=df_cer, df_ssp=df_ssp, sim=sim,
+                               GraphRipartizioneQuote=GraphRipartizioneQuote,
+                               GraphConfrontoCondivisioneRid=GraphConfrontoCondivisioneRid,
+                               GraphRipartizioneCondivisione=GraphRipartizioneCondivisione,
+                               GraphBilancioEnergetico=GraphBilancioEnergetico,
+                               GraphEntrateTotali=GraphEntrateTotali,
+                               GraphConfrontoBenefici=GraphConfrontoBenefici)
+    except:
+        flash('Impossibile elaborare i grafici.', category='error')
+        return render_template("dettagli_sim.html", user=current_user, df_cer=df_cer, df_ssp=df_ssp, sim=sim)
