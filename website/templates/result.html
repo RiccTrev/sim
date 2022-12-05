@@ -113,11 +113,56 @@
         <button type="button" class="btn btn-secondary btn-sm" onclick="exportTableToExcel('SimSSP', 'simulation-df_ssp')">Scarica tabella in formato Excel</button>
       </div>
     </div>
+  <!-- Grafici -->
+  <div class="container">
+  <div class="row">
+    <h1 align='center'>Grafici</h1>
+   <!--Grafico ripartizione Quote-->
+    <div id="GraphRipartizioneQuote" class="chart container-fluid"></div>
+    <div id="GraphBilancioEnergetico" class="chart container-fluid"></div>
+    <div id="GraphRipartizioneCondivisione" class="container-fluid chart"></div>
+    <div id="GraphEntrateTotali" class="container-fluid chart"></div>
+    <div id="GraphConfrontoCondivisioneRid" class="container-fluid chart"></div>
+    <div id="GraphConfrontoBenefici" class="container-fluid chart"></div>
+  </div>
+  </div>
 
   </div>
 
 </div>
 
+
+<!--SCRIPT CREAZIONE GRAFICI-->
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript'>
+  var graphs = {{ GraphRipartizioneQuote | safe }};
+  Plotly.plot('GraphRipartizioneQuote',graphs,{});
+</script>
+
+<script type='text/javascript'>
+  var graphs = {{ GraphBilancioEnergetico | safe }};
+  Plotly.plot('GraphBilancioEnergetico',graphs,{});
+</script>
+
+<script type='text/javascript'>
+  var graphs = {{ GraphRipartizioneCondivisione | safe }};
+  Plotly.plot('GraphRipartizioneCondivisione',graphs,{});
+</script>
+
+<script type='text/javascript'>
+  var graphs = {{ GraphEntrateTotali | safe }};
+  Plotly.plot('GraphEntrateTotali',graphs,{});
+</script>
+
+<script type='text/javascript'>
+  var graphs = {{ GraphConfrontoCondivisioneRid | safe }};
+  Plotly.plot('GraphConfrontoCondivisioneRid',graphs,{});
+</script>
+
+<script type='text/javascript'>
+  var graphs = {{ GraphConfrontoBenefici | safe }};
+  Plotly.plot('GraphConfrontoBenefici',graphs,{});
+</script>
 <!--
 <div class="row"></div>
 <h1>Seconda riga</h1>

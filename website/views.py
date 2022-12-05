@@ -95,6 +95,13 @@ def set_up():
 
             # Salvo la simulazione nel database
             try:
+                GraphRipartizioneQuote = graphs.RipartizioneQuote(df_cer, df_summary)
+                GraphConfrontoCondivisioneRid = graphs.ConfrontoCondivisioneRid(df_cer, df_summary)
+                GraphRipartizioneCondivisione = graphs.RipartizioneCondivisione(df_cer)
+                GraphBilancioEnergetico = graphs.BilancioEnergetico(df_cer)
+                GraphEntrateTotali = graphs.EntrateTotali(df_cer)
+                GraphConfrontoBenefici = graphs.ConfrontoBenefici(df_cer)
+
                 new_sim = Simulazioni(nome=nome,
                                       costo_medio_energia=float(costo_medio_energia),
                                       incentivo_arera=float(incentivo_arera),
@@ -121,7 +128,13 @@ def set_up():
 
                 db.session.add(new_sim)
                 db.session.commit()
-                return render_template('result.html', user=current_user, df_cer=df_cer, df_ssp=df_ssp, sim=new_sim)
+                return render_template('result.html', user=current_user, df_cer=df_cer, df_ssp=df_ssp, sim=new_sim,
+                                       GraphRipartizioneQuote=GraphRipartizioneQuote,
+                                       GraphConfrontoCondivisioneRid=GraphConfrontoCondivisioneRid,
+                                       GraphRipartizioneCondivisione=GraphRipartizioneCondivisione,
+                                       GraphBilancioEnergetico=GraphBilancioEnergetico,
+                                       GraphEntrateTotali=GraphEntrateTotali,
+                                       GraphConfrontoBenefici=GraphConfrontoBenefici)
 
             except:
                 flash('Impossibile salvare la simulazione. Controllare parametri in input', category='error')
