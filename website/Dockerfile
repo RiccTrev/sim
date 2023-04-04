@@ -2,10 +2,10 @@
 FROM python:3.11
 
 # Set the working directory in the container
-WORKDIR /Sim
+WORKDIR /website
 
 # Copy the application files into the working directory
-COPY . /Sim
+COPY .. /website
 
 # Install the application dependencies
 RUN pip install -r requirements.txt
