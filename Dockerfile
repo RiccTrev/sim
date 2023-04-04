@@ -5,7 +5,7 @@ FROM python:3.11
 WORKDIR /Sim
 
 # Copy the application files into the working directory
-COPY .. /Sim
+COPY . /Sim
 
 # Install the application dependencies
 RUN pip install -r requirements.txt
