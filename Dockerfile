@@ -1,11 +1,11 @@
 # Use the official Python image as the base image
-FROM python:3.8
+FROM python:3.11
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /Sim
 
 # Copy the application files into the working directory
-COPY . /app
+COPY . /Sim
 
 # Install the application dependencies
 RUN pip install -r requirements.txt
